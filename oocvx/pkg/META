@@ -1,0 +1,7 @@
+description = "Ocaml Online Convex Optimization"
+version = "%%VERSION_NUM%%"
+requires = "batteries,sexplib,csv,cmdliner"
+archive(byte) = "oocvx.cma"
+archive(native) = "oocvx.cmxa"
+plugin(byte) = "oocvx.cma"
+plugin(native) = "oocvx.cmxs"

@@ -1,0 +1,12 @@
+true : bin_annot, safe_string, package(bytes)
+
+true : package(batteries)
+true : package(cmdliner)
+true : package(sexplib)
+true : package(csv)
+
+<src> : include
+<test> : include
+
+<doc/*.docdir>: plugin(doc/plugin.cma)
+<doc/*plugin*>: package(ocamldoc)

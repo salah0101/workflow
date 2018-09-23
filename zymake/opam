@@ -1,0 +1,20 @@
+opam-version: "1.2"
+maintainer: "Valentin Reis <fre@freux.fr>"
+authors: ["Valentin Reis <fre@freux.fr>"]
+homepage: "http://www-personal.umich.edu/~ebreck/code/zymake/"
+doc: "https://github.com/freuk/zymake"
+license: "BSD3"
+dev-repo: "https://github.com/freuk/zymake"
+bug-reports: "https://github.com/freuk/zymake"
+tags: []
+available: [ ocaml-version >= "4.01.0"]
+depends: [
+  "ocamlfind" {build}
+  "ocamlbuild" {build}
+  "topkg" {build}
+  "batteries"
+   ]
+depopts: []
+build: [
+  "ocaml" "pkg/pkg.ml" "build"
+   "--pinned" "%{pinned}%" ]

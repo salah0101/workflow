@@ -1,0 +1,7 @@
+description = "Zymake workflow system"
+version = "%%VERSION_NUM%%"
+requires = "batteries"
+archive(byte) = "zymake.cma"
+archive(native) = "zymake.cmxa"
+plugin(byte) = "zymake.cma"
+plugin(native) = "zymake.cmxs"

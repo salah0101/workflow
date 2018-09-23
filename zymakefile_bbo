@@ -1,0 +1,105 @@
+
+traces= ANL-Intrepid CEA-Curie CTC-SP2 KTH-SP2 SDSC-BLUE SDSC-SP2 UniLu-Gaia
+policyfam_full = wait mwait lpf lqf expfact mexpfact lrf srf laf
+
+period = 86400
+
+back = sqf
+
+stat = cumwait
+
+budget = 10
+
+id1_train  = $(range 1 2)
+
+id2_train = $(range 1 1)
+
+id1_test  = $(range 1 2)
+
+id2_test = $(range 1 1)
+
+########################################## Data Management ##################################
+
+# downloading traces
+#echo "wget"; cp gz/$(trace).swf.gz $(>).swf_gz
+
+cp gz/$(trace).swf.gz $(>).swf_gz
+
+#unzipping
+gunzip $().swf_gz -c > $().swf_unfiltered
+
+#filtering
+misc/strong_filter $(<).swf_unfiltered $(> type = "whole").swf
+
+#splitting
+misc/split_swf.sh train $(< type="whole").swf $(> type="wholesplit" split="train").swf
+
+#splitting
+misc/split_swf.sh test $(< type="whole").swf $(> type="wholesplit" split="test").swf
+
+#resampling
+ocs-sampler -i $(< type = "wholesplit").swf
+-o $(> type = "shuffled").swf -seed $(id1)
+
+#trimming
+ocs-trimmer -i $(< type="shuffled").swf -o $(> type="trimmed").swf
+
+#cutting
+ocs-subtrace -i $(< type="trimmed").swf
+-o $(> type ="weekdata").swf -wk $(id2) -span 2
+
+cat $(< type="whole").swf | grep ";" > $(> type="header").swf
+
+cat $(< type="header").swf $(< type="weekdata").swf > $(> type="week").swf
+
+########################################## Experiments #####################################
+
+#for normalization purposes, to extract the features
+ocs mixed $(type="week" split="train").swf
+--alpha=1,1,1,1,1,1:1,1,1,1,1,1:1,1,1,1,1,1
+--ft_out=$(>).ft_out
+--backfill=$(back)
+
+#--alphapoly=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+#--alphathreshold=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+
+tail -n +2 $(<).ft_out > $(>).ft_body
+
+head -n 1 $(<).ft_out > $(>).ft_head
+
+cat $(<id1=1 id2=1).ft_head $(id1=*id1_train id2=*id2_train).ft_body > $(>).ft
+
+#this script defines what normalization is used
+src/normalize.py $(<).ft > $(>).norm_out
+
+#ARGUMENT PASSING "TRICK"
+echo "--proba" > $(>).ma
+
+echo "--backfill=$(back)" > $(>).mb
+
+echo "--stat=$(stat)" > $(>).mc
+
+cat $(<).mb $(<).mc> $(>).more_arg
+
+#basic strategy
+src/bbo.py
+$(budget)
+$(<).more_arg
+$(<).norm_out
+$(>).vec_out
+$(id1=*id1_train id2=*id2_train type="week" split="train").swf
+> $(>).out_train
+
+#vec_out is "the model"
+src/bbot.py
+$(<).more_arg
+$(<).norm_out
+$(<).vec_out
+$(id1=*id1_test id2=*id2_test type="week" split="test").swf
+> $(>).out_test
+
+cat $(<).out_train $(<).out_test > $().out_process
+
+########################################## Visu #####################################
+
+: ls; cat $(trace="KTH-SP2").out_process

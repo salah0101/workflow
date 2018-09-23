@@ -1,0 +1,24 @@
+; Version: 2.2
+; Computer: IBM SP2
+; Installation: Swedish Royal Institute of Technology (KTH)
+; Acknowledge: Lars Malinowsky
+; Information: http://www.pdc.kth.se/
+;              http://www.cs.huji.ac.il/labs/parallel/workload/
+; Conversion: Dror Feitelson (feit@cs.huji.ac.il) 01 Jan 2012
+; MaxJobs: 28490
+; MaxRecords: 28476
+; Preemption: No
+; UnixStartTime: 843480031
+; TimeZone: 3600
+; TimeZoneString: Europe/Stockholm
+; StartTime: Mon Sep 23 14:00:31 CEST 1996
+; EndTime:   Fri Aug 29 10:55:01 CEST 1997
+; MaxNodes: 100
+; MaxProcs: 100
+; Note: uses the EASY scheduler
+;
+;
+; Note: THIS IS A CLEANED VERSION OF THE LOG!
+;       The filter used to produce it was
+;         job<=14 (14 jobs removed)
+;

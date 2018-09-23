@@ -1,0 +1,7 @@
+true : thread, bin_annot, safe_string, package(bytes), unsafe_string
+false : safe_string
+
+true : package(batteries)
+
+<src> : include
+<test> : include

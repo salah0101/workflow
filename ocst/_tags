@@ -1,0 +1,12 @@
+true : bin_annot, safe_string, package(bytes)
+
+true : package(cmdliner)
+true : package(ZMQ)
+true : package(ppx_sexp_conv)
+true : package(ppx_deriving.std)
+true : package(ppx_deriving_protobuf)
+true : package(sexplib)
+true : package(batteries)
+
+<src> : include
+<test> : include
