@@ -13,7 +13,7 @@ back = spf
 stat=avgbsld
 budget = 2
 
-id_train = $(range 1 5)
+id_train = $(range 1 100)
 
 
 ########################################## Data Management ##################################
@@ -86,4 +86,4 @@ cat $(<).mb $(<).mc> $(>).more_arg
 
 ########################################## Visu #####################################
 
-: ls;cat $(trace="KTH-SP2").out_single_run
+: ls;cat $(trace=*traces).out_single_run

@@ -189,7 +189,7 @@ def execute_single_weeks(pol=None,name="Unamed"):
         id_string=f.split(".")
         li=[id_string[1] ,id_string[3],name,simulate(f,pol),simulate_max(f,pol)]
         grand_list.append(li)
-    save_progress(l=grand_list,file_name="logs/policies_performace.csv",mode="a")
+    save_progress(l=grand_list,file_name=policies_performace_file,mode="a")
 
 
 # Main
@@ -203,6 +203,10 @@ if __name__ == '__main__':
 
     threshold= args["<threshold>"].strip()
     trace=args["<trace>"].strip()
+
+    policies_performace_file="logs/policies_performace"+trace+".csv"
+    learned_vectors_file="logs/learned_vectors"+trace+".csv"
+
     #sys.exit('stopping execution')
 
 
@@ -220,8 +224,8 @@ if __name__ == '__main__':
     pure_policy_list=get_pure_policy_list()
     grand_list=[]
     grand_list.append(["id","trace","policy","avg","max"])
-    save_progress(l=grand_list,file_name="logs/policies_performace.csv",mode="w")
-    save_progress(l=[["id","trace","vector"]],file_name="logs/learned_vectors.csv",mode="w")
+    save_progress(l=grand_list,file_name=policies_performace_file,mode="w")
+    save_progress(l=[["id","trace","vector"]],file_name=learned_vectors_file,mode="w")
 
 	#performance of pure policies
     if(simulate_pure):
@@ -244,15 +248,15 @@ if __name__ == '__main__':
             l=[id_string[1] ,id_string[3], "xnes_dynamic_clairvoyant_6" , simulate(file,r[0]) , simulate_max(file,r[0])]
             grand_list.append(l)
             learned_vector_list_next.append([file,r[0]])
-            save_progress(l=grand_list,file_name="logs/policies_performace.csv",mode="a")
-            save_progress(l=[[id_string[1] ,id_string[3],";".join(str(nb) for nb in r[0])]],file_name="logs/learned_vectors.csv",mode="a")
+            save_progress(l=grand_list,file_name=policies_performace_file,mode="a")
+            save_progress(l=[[id_string[1] ,id_string[3],";".join(str(nb) for nb in r[0])]],file_name=learned_vectors_file,mode="a")
             grand_list=[]
 
     if (learning_offline_clairvoyant_6):
         print("learning offline clairvoyant for 6 features")
         r=learn_xnes_batch()
         execute_single_weeks(pol=r[0],name="learning_offline_clairvoyant_6")
-        save_progress(l=[["learning_offline_clairvoyant_6",trace,";".join(str(nb) for nb in r[0])]],file_name="logs/learned_vectors.csv",mode="a")
+        save_progress(l=[["learning_offline_clairvoyant_6",trace,";".join(str(nb) for nb in r[0])]],file_name=learned_vectors_file,mode="a")
 
     if(learning_offline_6):
         print("learning offline for 6 features")
@@ -261,7 +265,7 @@ if __name__ == '__main__':
         f_testing=args["<swf_file>"][int(size/2):]
         r=learn_xnes_batch_training()
         execute_single_weeks(pol=r[0],name="learning_offline_6") 
-        save_progress(l=[["learning_offline_6",trace,";".join(str(nb) for nb in r[0])]],file_name="logs/learned_vectors.csv",mode="a")
+        save_progress(l=[["learning_offline_6",trace,";".join(str(nb) for nb in r[0])]],file_name=learned_vectors_file,mode="a")
     
     if(succsesive_learning_6):
         print("testing each learned vector on the next week: 6 features")
@@ -277,7 +281,7 @@ if __name__ == '__main__':
             l=[id_string[1] ,id_string[3] , "past_week_6" , simulate(file,vector) ,simulate_max(file,vector)]
             grand_list.append(l)
             
-            save_progress(l=grand_list,file_name="logs/policies_performace.csv",mode="a")
+            save_progress(l=grand_list,file_name=policies_performace_file,mode="a")
             grand_list=[]
             i+=1
     if(learning_dynamic_clairvoyant_3):
@@ -292,15 +296,15 @@ if __name__ == '__main__':
             l=[id_string[1] ,id_string[3], "xnes_dynamic_clairvoyant_3" , simulate(file,r[0]) , simulate_max(file,r[0])]
             grand_list.append(l)
             learned_vector_list_next.append([file,r[0]])
-            save_progress(l=grand_list,file_name="logs/policies_performace.csv",mode="a")
-            save_progress(l=[[id_string[1] ,id_string[3],";".join(str(nb) for nb in r[0])]],file_name="logs/learned_vectors.csv",mode="a")
+            save_progress(l=grand_list,file_name=policies_performace_file,mode="a")
+            save_progress(l=[[id_string[1] ,id_string[3],";".join(str(nb) for nb in r[0])]],file_name=learned_vectors_file,mode="a")
             grand_list=[]
 
     if (learning_offline_clairvoyant_3):
         print("learning offline clairvoyant for 6 features")
         r=learn_xnes_batch(x0=np.array([0.0,0.0,0.0]))
         execute_single_weeks(pol=r[0],name="learning_offline_clairvoyant_3")
-        save_progress(l=[["learning_offline_clairvoyant_3",trace,";".join(str(nb) for nb in r[0])]],file_name="logs/learned_vectors.csv",mode="a")
+        save_progress(l=[["learning_offline_clairvoyant_3",trace,";".join(str(nb) for nb in r[0])]],file_name=learned_vectors_file,mode="a")
 
     if(learning_offline_3):
         print("learning offline for 6 features")
@@ -309,7 +313,7 @@ if __name__ == '__main__':
         f_testing=args["<swf_file>"][int(size/2):]
         r=learn_xnes_batch_training(x0=np.array([0.0,0.0,0.0]))
         execute_single_weeks(pol=r[0],name="learning_offline_3") 
-        save_progress(l=[["learning_offline_3",trace,";".join(str(nb) for nb in r[0])]],file_name="logs/learned_vectors.csv",mode="a")
+        save_progress(l=[["learning_offline_3",trace,";".join(str(nb) for nb in r[0])]],file_name=learned_vectors_file,mode="a")
     
     if(succsesive_learning_3):
         print("testing each learned vector on the next week: 6 features")
@@ -325,7 +329,7 @@ if __name__ == '__main__':
             l=[id_string[1] ,id_string[3] , "past_week_3" , simulate(file,vector) ,simulate_max(file,vector)]
             grand_list.append(l)
             
-            save_progress(l=grand_list,file_name="logs/policies_performace.csv",mode="a")
+            save_progress(l=grand_list,file_name=policies_performace_file,mode="a")
             grand_list=[]
             i+=1
 
