@@ -28,7 +28,7 @@ module BSLD = struct
   let criteria jobs _ now id =
     Value ( max 1.
             (float_of_int (now - (Hashtbl.find jobs id).r) /.
-             max (float_of_int (Hashtbl.find jobs id).p_est) 600. ))
+             max (float_of_int (Hashtbl.find jobs id).p_est) 10. ))
 end
 
 module FCFS = struct

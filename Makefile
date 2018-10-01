@@ -24,6 +24,11 @@ clean:
 	rm -rf logs
 	mkdir logs
 
+.PHONY:part_clean
+part_clean:
+	rm -rf logs
+	mkdir logs
+
 .PHONY:jupyter
 jupyter:
 	nix-shell default.nix -A jupyter

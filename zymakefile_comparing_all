@@ -1,0 +1,89 @@
+
+#traces= ANL-Intrepid CEA-Curie CTC-SP2 KTH-SP2 SDSC-BLUE SDSC-SP2 UniLu-Gaia Sandia 
+#traces= SDSC-BLUE SDSC-SP2 KTH-SP2 CTC-SP2 ANL-Intrepid lublin3_tsafrir
+traces=SDSC-BLUE SDSC-SP2 
+#traces=KTH-SP2 CTC-SP2 ANL-Intrepid
+policyfam_full = wait mwait lpf lqf expfact mexpfact lrf srf laf
+
+period = 604800
+threshold = 200000
+
+back = spf
+
+stat=avgbsld
+budget = 2
+
+id_train = $(range 1 5)
+
+
+########################################## Data Management ##################################
+
+# downloading traces
+#echo "wget"; cp gz/$(trace).swf.gz $(>).swf_gz
+
+cp gz/$(trace).swf.gz $(>).swf_gz
+
+#unzipping
+gunzip $().swf_gz -c > $().swf_unfiltered
+
+#filtering
+misc/strong_filter $(<).swf_unfiltered $(> type = "whole").swf
+
+#splitting
+misc/split_swf.sh all $(< type="whole").swf $(> type="wholesplit" split="all").swf
+
+
+#trimming
+ocs-trimmer -i $(< type="wholesplit").swf -o $(> type="trimmed").swf
+
+#cutting
+ocs-subtrace -i $(< type="trimmed").swf
+-o $(> type ="weekdata").swf -wk $(id1) -span 2
+
+cat $(< type="whole").swf | grep ";" > $(> type="header").swf
+
+cat $(< type="header").swf $(< type="weekdata").swf > $(> type="week").swf
+
+########################################## Experiments #####################################
+
+#for normalization purposes, to extract the features
+ocs mixed $(type="week" split="all").swf
+--alpha=1,1,1,1,1,1:1,1,1,1,1,1:1,1,1,1,1,1
+--ft_out=$(>).ft_out
+--backfill=$(back)
+
+#--alphapoly=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+#--alphathreshold=1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1:1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+
+tail -n +2 $(<).ft_out > $(>).ft_body
+
+head -n 1 $(<).ft_out > $(>).ft_head
+
+cat $(<id1=1).ft_head $(id1=*id_train).ft_body > $(>).ft
+
+#this script defines what normalization is used
+src/normalize.py $(<).ft > $(>).norm_out
+
+#ARGUMENT PASSING "TRICK"
+echo "--proba" > $(>).ma
+
+echo "--backfill=$(back)" > $(>).mb
+
+echo "--stat=$(stat)" > $(>).mc
+
+cat $(<).mb $(<).mc> $(>).more_arg
+
+#basic strategy
+ src/comparing_all.py
+ $(budget)
+ $(<).more_arg
+ $(<).norm_out
+ $(trace)
+ $(threshold)
+ $(>).vec_out
+ $(id1=*id_train type="week" split="all").swf
+ |tee $(>).out_single_run
+
+########################################## Visu #####################################
+
+: ls;cat $(trace="KTH-SP2").out_single_run

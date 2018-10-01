@@ -1,7 +1,7 @@
 open Io
 open System
 open BatEnum
-
+(*****  let weeksize = 2592000*3(three months)  604800(one week) 86400 (one day)*****)
 let weeksize = 604800
 
 let () =
